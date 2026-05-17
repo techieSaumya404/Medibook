@@ -1,0 +1,4286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediBook - Smart Doctor Appointment System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2a7de1;
+            --primary-light: #e8f2ff;
+            --secondary: #00c6a9;
+            --dark: #333;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #4a90e2;
+            --primary-light: #1a2c42;
+            --secondary: #00d4b3;
+            --dark: #f0f0f0;
+            --light: #1e2a3a;
+            --gray: #a0aec0;
+            --danger: #fc5c65;
+            --success: #2ecc71;
+            --warning: #fed330;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--light);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+            background: var(--primary-light);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .accessibility-btn {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .accessibility-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a6fd0;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            min-height: calc(100vh - 200px);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            box-shadow: var(--shadow);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            background: white;
+            color: var(--dark);
+        }
+
+        .search-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .search-box button:hover {
+            background: #1a6fd0;
+        }
+
+        .emergency-btn {
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animated Images in Hero */
+        .hero-animations {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 3rem;
+            color: rgba(42, 125, 225, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-icon:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-icon:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-icon:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        /* Filter Section */
+        .filters {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: var(--dark);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.1);
+        }
+
+        /* Specialties Section */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .specialties {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .specialty-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .specialty-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .specialty-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .specialty-card:hover .specialty-icon {
+            animation: bounce 0.5s;
+            background: var(--primary);
+            color: white;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .specialty-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        /* Live Doctors Section */
+        .live-doctors {
+            margin: 40px 0;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--danger);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        /* Video Call Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-content {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .control-btn.end-call {
+            background: var(--danger);
+        }
+
+        /* Symptom Checker */
+        .symptom-checker {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .symptom-checker h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-option {
+            padding: 12px 15px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .symptom-option:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .symptom-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .suggestion-result {
+            background: var(--success);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        /* Doctors Section */
+        .doctors {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .doctor-card {
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .doctor-card.expanded {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .doctor-img {
+            height: 200px;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doctor-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .doctor-info {
+            padding: 20px;
+        }
+
+        .doctor-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .doctor-specialty {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .doctor-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+            color: #ffc107;
+        }
+
+        .doctor-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .doctor-card.expanded .doctor-details {
+            max-height: 500px;
+        }
+
+        .doctor-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .compare-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .compare-btn:hover {
+            background: #00b398;
+            transform: translateY(-2px);
+        }
+
+        /* Doctor Profile Page */
+        .doctor-profile {
+            padding: 40px 0;
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: var(--light);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid var(--primary-light);
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .profile-info .specialty {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .detail-card {
+            background: var(--light);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .detail-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        /* Doctor Comparison */
+        .comparison-section {
+            display: none;
+            margin: 40px 0;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .comparison-card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .comparison-card.highlight {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .comparison-features {
+            list-style: none;
+        }
+
+        .comparison-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .feature-name {
+            font-weight: 500;
+        }
+
+        .feature-value {
+            color: var(--primary);
+        }
+
+        /* Multi-Step Booking */
+        .booking-wizard {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin: 40px 0;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-light);
+            z-index: 1;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: var(--progress-width, 0%);
+            height: 4px;
+            background: var(--primary);
+            z-index: 2;
+            transition: width 0.5s ease;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+
+        .progress-step.active .step-number {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        /* Patient Mode Selector */
+        .patient-mode {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mode-option {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: var(--primary-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .mode-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .mode-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Calendar UI */
+        .calendar-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 10px 5px;
+            font-weight: bold;
+            color: var(--gray);
+        }
+
+        .calendar-date {
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .calendar-date.available {
+            background: var(--primary-light);
+            color: var(--dark);
+        }
+
+        .calendar-date.available:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-date.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-date.unavailable {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            background: var(--primary-light);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .time-slot:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Reviews Section */
+        .reviews-container {
+            margin-top: 40px;
+        }
+
+        .review-card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .review-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+        }
+
+        .review-rating {
+            color: #ffc107;
+        }
+
+        .review-date {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .review-form {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .rating-star {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .rating-star:hover {
+            color: #ffc107;
+            transform: scale(1.2);
+        }
+
+        .rating-star.active {
+            color: #ffc107;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            padding: 40px 0;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .dashboard-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            color: var(--gray);
+        }
+
+        .appointments-list {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .appointment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .appointment-item:hover {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+
+        .appointment-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Emergency Modal */
+        .emergency-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emergency-content {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .emergency-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Accessibility Panel */
+        .accessibility-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px 0 0 10px;
+            box-shadow: var(--shadow);
+            z-index: 999;
+        }
+
+        .accessibility-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .accessibility-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .accessibility-option:hover {
+            background: var(--primary-light);
+        }
+
+        /* Appointment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+            color: var(--dark);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Confirmation Section */
+        .confirmation {
+            text-align: center;
+            padding: 50px 0;
+            background: var(--light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2.5rem;
+            animation: bounce 0.5s;
+        }
+
+        .confirmation h2 {
+            margin-bottom: 15px;
+            color: var(--success);
+        }
+
+        .confirmation p {
+            margin-bottom: 25px;
+            color: var(--gray);
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: #f5f5f5;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            flex-direction: column;
+            gap: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* High Contrast Mode */
+        .high-contrast {
+            --primary: #0000ff;
+            --primary-light: #e0e0ff;
+            --secondary: #00ff00;
+            --dark: #000000;
+            --light: #ffffff;
+            --gray: #666666;
+            --danger: #ff0000;
+            --success: #008000;
+            --warning: #ffa500;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .doctor-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .patient-mode {
+                flex-direction: column;
+            }
+
+            .appointment-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .appointment-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .header-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-image {
+                margin: 0 auto;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility Panel -->
+    <div class="accessibility-panel" id="accessibilityPanel">
+        <div class="accessibility-options">
+            <div class="accessibility-option" id="highContrastToggle">
+                <i class="fas fa-adjust"></i>
+                <span>High Contrast</span>
+            </div>
+            <div class="accessibility-option" id="textSizeIncrease">
+                <i class="fas fa-text-height"></i>
+                <span>Increase Text</span>
+            </div>
+            <div class="accessibility-option" id="textSizeDecrease">
+                <i class="fas fa-text-width"></i>
+                <span>Decrease Text</span>
+            </div>
+            <div class="accessibility-option" id="readAloud">
+                <i class="fas fa-volume-up"></i>
+                <span>Read Aloud</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo" id="homeLink">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>MediBook</span>
+                </div>
+                <div class="nav-links">
+                    <a class="nav-link active" data-page="home">Home</a>
+                    <a class="nav-link" data-page="doctors">Doctors</a>
+                    <a class="nav-link" data-page="appointments">Appointments</a>
+                    <a class="nav-link" data-page="reviews">Reviews</a>
+                    <a class="nav-link" data-page="dashboard">Dashboard</a>
+                </div>
+                <div class="header-controls">
+                    <button class="accessibility-btn" id="accessibilityToggle">
+                        <i class="fas fa-universal-access"></i>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Home Page -->
+        <div class="page active" id="home">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-animations">
+                    <div class="floating-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="floating-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="floating-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                </div>
+                <div class="container hero-content">
+                    <h1>Find & Book Appointments with Trusted Doctors</h1>
+                    <p>Connect with healthcare professionals easily and manage your health with our smart booking platform</p>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search for doctors, specialties, or conditions...">
+                        <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="btn btn-danger emergency-btn" id="emergencyBtn">
+                        <i class="fas fa-bolt"></i> Quick Emergency Help
+                    </button>
+                </div>
+            </section>
+
+            <!-- Symptom Checker -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Smart Symptom Checker</h2>
+                        <p>Select your symptoms and we'll suggest the right specialist</p>
+                    </div>
+                    <div class="symptom-checker">
+                        <h3>What symptoms are you experiencing?</h3>
+                        <div class="symptoms-grid" id="symptomsGrid">
+                            <div class="symptom-option" data-specialist="Pulmonologist">Cough</div>
+                            <div class="symptom-option" data-specialist="Dermatologist">Skin Rash</div>
+                            <div class="symptom-option" data-specialist="Neurologist">Headache</div>
+                            <div class="symptom-option" data-specialist="Gastroenterologist">Stomach Pain</div>
+                            <div class="symptom-option" data-specialist="Cardiologist">Chest Pain</div>
+                            <div class="symptom-option" data-specialist="Orthopedist">Joint Pain</div>
+                            <div class="symptom-option" data-specialist="ENT Specialist">Ear Pain</div>
+                            <div class="symptom-option" data-specialist="Ophthalmologist">Vision Problems</div>
+                        </div>
+                        <button class="btn btn-primary" id="checkSymptomsBtn">Check Symptoms</button>
+                        <div class="suggestion-result" id="suggestionResult">
+                            <h3>Recommended Specialist</h3>
+                            <p id="recommendedSpecialist"></p>
+                            <button class="btn btn-outline" id="bookSpecialistBtn">Book Appointment</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Specialties Section -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Medical Specialties</h2>
+                        <p>Browse doctors by their area of specialization</p>
+                    </div>
+                    <div class="specialties">
+                        <div class="specialty-card" data-specialty="Cardiology">
+                            <div class="specialty-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <h3>Cardiology</h3>
+                            <p>Heart and cardiovascular health</p>
+                        </div>
+                        <div class="specialty-card" data-specialty="Neurology">
+                            <div class="specialty-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>Neurology</h3>
+                            <p>Brain and nervous system disorders</p>
+                        </div>
+                        <div class="specialty-card" data-specialty="Pediatrics">
+                            <div class="specialty-icon">
+                                <i class="fas fa-baby"></i>
+                            </div>
+                            <h3>Pediatrics</h3>
+                            <p>Healthcare for children and infants</p>
+                        </div>
+                        <div class="specialty-card" data-specialty="Orthopedics">
+                            <div class="specialty-icon">
+                                <i class="fas fa-bone"></i>
+                            </div>
+                            <h3>Orthopedics</h3>
+                            <p>Bones, joints, and muscles</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Doctors Preview -->
+            <section class="section" style="background-color: var(--primary-light);">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Our Top Doctors</h2>
+                        <p>Experienced medical professionals ready to help</p>
+                        <button class="btn btn-outline" id="viewAllDoctorsBtn">View All Doctors</button>
+                    </div>
+                    <div class="doctors" id="doctorsContainer">
+                        <!-- Doctor cards will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Doctors Page -->
+        <div class="page" id="doctors">
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Find Your Doctor</h2>
+                        <p>Browse our complete list of healthcare professionals</p>
+                    </div>
+                    
+                    <!-- Filter Section -->
+                    <div class="filters">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="specialtyFilter">Specialty</label>
+                                <select id="specialtyFilter" class="filter-select">
+                                    <option value="">All Specialties</option>
+                                    <option value="Cardiology">Cardiology</option>
+                                    <option value="Neurology">Neurology</option>
+                                    <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Orthopedics">Orthopedics</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="availabilityFilter">Availability</label>
+                                <select id="availabilityFilter" class="filter-select">
+                                    <option value="">Any Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="tomorrow">Tomorrow</option>
+                                    <option value="thisWeek">This Week</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="locationFilter">Location</label>
+                                <select id="locationFilter" class="filter-select">
+                                    <option value="">All Locations</option>
+                                    <option value="nearby">Near Me</option>
+                                    <option value="delhi">Delhi</option>
+                                    <option value="mumbai">Mumbai</option>
+                                    <option value="bangalore">Bangalore</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="ratingFilter">Minimum Rating</label>
+                                <select id="ratingFilter" class="filter-select">
+                                    <option value="0">Any Rating</option>
+                                    <option value="4">4+ Stars</option>
+                                    <option value="4.5">4.5+ Stars</option>
+                                    <option value="5">5 Stars</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-box" style="max-width: 500px; margin-bottom: 30px;">
+                        <input type="text" id="doctorSearchInput" placeholder="Search doctors by name or specialty...">
+                        <button id="doctorSearchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    
+                    <button class="btn btn-outline" id="compareDoctorsBtn">Compare Doctors</button>
+                    
+                    <!-- Live Doctors Section -->
+                    <div class="live-doctors">
+                        <h3 style="margin: 40px 0 20px;">Doctors Available Now <span class="live-indicator"><i class="fas fa-circle"></i> LIVE</span></h3>
+                        <div class="doctors" id="liveDoctorsContainer">
+                            <!-- Live doctor cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="doctors" id="allDoctorsContainer">
+                        <!-- All doctor cards will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctor Comparison Section -->
+            <section class="section comparison-section" id="comparisonSection">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Compare Doctors</h2>
+                        <p>Select up to 3 doctors to compare</p>
+                    </div>
+                    <div class="comparison-container" id="comparisonContainer">
+                        <!-- Comparison cards will be populated by JavaScript -->
+                    </div>
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn btn-primary" id="bookFromComparisonBtn">Book Selected Doctor</button>
+                        <button class="btn btn-outline" id="closeComparisonBtn">Close Comparison</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Doctor Profile Page -->
+        <div class="page" id="doctorProfile">
+            <section class="doctor-profile">
+                <div class="container">
+                    <div class="profile-header" id="doctorProfileHeader">
+                        <!-- Doctor profile will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-card">
+                            <h3>About Me</h3>
+                            <p id="doctorAbout">Loading...</p>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h3>Education & Qualifications</h3>
+                            <ul id="doctorEducation">
+                                <!-- Education details will be populated by JavaScript -->
+                            </ul>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h3>Specializations</h3>
+                            <ul id="doctorSpecializations">
+                                <!-- Specializations will be populated by JavaScript -->
+                            </ul>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h3>Availability</h3>
+                            <p id="doctorAvailability">Loading...</p>
+                            <button class="btn btn-primary" id="bookThisDoctorBtn">Book Appointment</button>
+                            <button class="btn btn-success" id="videoCallBtn" style="margin-left: 10px;"><i class="fas fa-video"></i> Video Consult</button>
+                        </div>
+                    </div>
+                    
+                    <div class="reviews-container">
+                        <h3 style="margin-bottom: 20px;">Patient Reviews</h3>
+                        <div id="doctorReviewsList">
+                            <!-- Doctor reviews will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Appointments Page -->
+        <div class="page" id="appointments">
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>My Appointments</h2>
+                        <p>Manage your upcoming and past appointments</p>
+                    </div>
+                    
+                    <div class="booking-wizard" id="bookingWizard">
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-step active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">Select Patient</div>
+                            </div>
+                            <div class="progress-step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">Choose Doctor</div>
+                            </div>
+                            <div class="progress-step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">Date & Time</div>
+                            </div>
+                            <div class="progress-step" data-step="4">
+                                <div class="step-number">4</div>
+                                <div class="step-label">Confirmation</div>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step active" id="step1">
+                            <h3>Who is this appointment for?</h3>
+                            <div class="patient-mode">
+                                <div class="mode-option selected" data-mode="self">
+                                    <i class="fas fa-user"></i>
+                                    <p>Myself</p>
+                                </div>
+                                <div class="mode-option" data-mode="child">
+                                    <i class="fas fa-child"></i>
+                                    <p>My Child</p>
+                                </div>
+                                <div class="mode-option" data-mode="parent">
+                                    <i class="fas fa-user-friends"></i>
+                                    <p>Parent</p>
+                                </div>
+                                <div class="mode-option" data-mode="other">
+                                    <i class="fas fa-users"></i>
+                                    <p>Someone Else</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="patientName">Full Name</label>
+                                <input type="text" id="patientName" class="form-control" placeholder="Enter patient's full name">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="patientAge">Age</label>
+                                    <input type="number" id="patientAge" class="form-control" placeholder="Age">
+                                </div>
+                                <div class="form-group">
+                                    <label for="patientGender">Gender</label>
+                                    <select id="patientGender" class="form-control">
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="wizard-actions">
+                                <div></div>
+                                <button class="btn btn-primary" id="nextToStep2Btn">Next</button>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step" id="step2">
+                            <h3>Select a Doctor</h3>
+                            <div class="doctors" id="wizardDoctors">
+                                <!-- Doctor cards for wizard -->
+                            </div>
+                            <div class="wizard-actions">
+                                <button class="btn btn-outline" id="backToStep1Btn">Back</button>
+                                <button class="btn btn-primary" id="nextToStep3Btn">Next</button>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step" id="step3">
+                            <h3>Select Date & Time</h3>
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <button class="btn btn-outline btn-sm" id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                                    <h4 id="currentMonth">November 2023</h4>
+                                    <button class="btn btn-outline btn-sm" id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendarGrid">
+                                    <!-- Calendar will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="time-slots" id="timeSlots">
+                                <!-- Time slots will be populated by JavaScript -->
+                            </div>
+                            <div class="wizard-actions">
+                                <button class="btn btn-outline" id="backToStep2Btn">Back</button>
+                                <button class="btn btn-primary" id="nextToStep4Btn">Next</button>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step" id="step4">
+                            <h3>Confirm Your Appointment</h3>
+                            <div class="confirmation-details" id="confirmationDetails">
+                                <!-- Confirmation details will be populated by JavaScript -->
+                            </div>
+                            <div class="wizard-actions">
+                                <button class="btn btn-outline" id="backToStep3Btn">Back</button>
+                                <button class="btn btn-primary" id="confirmBookingBtn">Confirm Appointment</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="appointments-list">
+                        <h3 style="margin-bottom: 20px;">Upcoming Appointments</h3>
+                        <div id="upcomingAppointments">
+                            <!-- Upcoming appointments will be populated by JavaScript -->
+                        </div>
+                        
+                        <h3 style="margin: 40px 0 20px;">Appointment History</h3>
+                        <div id="pastAppointments">
+                            <!-- Past appointments will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Reviews Page -->
+        <div class="page" id="reviews">
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Patient Reviews</h2>
+                        <p>See what our patients are saying about their experiences</p>
+                    </div>
+                    
+                    <div class="reviews-container">
+                        <div id="reviewsList">
+                            <!-- Reviews will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="review-form">
+                            <h3>Write a Review</h3>
+                            <div class="form-group">
+                                <label for="reviewDoctor">Select Doctor</label>
+                                <select id="reviewDoctor" class="form-control">
+                                    <option value="">Choose a doctor</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Your Rating</label>
+                                <div class="rating-input" id="ratingStars">
+                                    <span class="rating-star" data-rating="1"><i class="far fa-star"></i></span>
+                                    <span class="rating-star" data-rating="2"><i class="far fa-star"></i></span>
+                                    <span class="rating-star" data-rating="3"><i class="far fa-star"></i></span>
+                                    <span class="rating-star" data-rating="4"><i class="far fa-star"></i></span>
+                                    <span class="rating-star" data-rating="5"><i class="far fa-star"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reviewTitle">Review Title</label>
+                                <input type="text" id="reviewTitle" class="form-control" placeholder="Brief summary of your experience">
+                            </div>
+                            <div class="form-group">
+                                <label for="reviewText">Your Review</label>
+                                <textarea id="reviewText" class="form-control" rows="5" placeholder="Share details of your experience with this doctor"></textarea>
+                            </div>
+                            <button class="btn btn-primary" id="submitReviewBtn">Submit Review</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboard">
+            <section class="dashboard">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Patient Dashboard</h2>
+                        <p>Overview of your health journey with MediBook</p>
+                    </div>
+                    
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <h3 id="totalAppointments">0</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-stethoscope"></i>
+                            <h3 id="doctorsVisited">0</h3>
+                            <p>Doctors Visited</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-star"></i>
+                            <h3 id="avgRating">0.0</h3>
+                            <p>Average Rating</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-prescription"></i>
+                            <h3 id="prescriptions">0</h3>
+                            <p>Prescriptions</p>
+                        </div>
+                    </div>
+                    
+                    <div class="appointments-list">
+                        <h3 style="margin-bottom: 20px;">Recent Appointments</h3>
+                        <div id="recentAppointments">
+                            <!-- Recent appointments will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="reviews-container" style="margin-top: 40px;">
+                        <h3 style="margin-bottom: 20px;">My Reviews</h3>
+                        <div id="myReviews">
+                            <!-- User's reviews will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Emergency Modal -->
+    <div class="emergency-modal" id="emergencyModal">
+        <div class="emergency-content">
+            <h2><i class="fas fa-exclamation-triangle"></i> Emergency Assistance</h2>
+            <p>If this is a medical emergency, please call emergency services immediately.</p>
+            <div class="emergency-actions">
+                <button class="btn btn-danger" id="callEmergencyBtn">
+                    <i class="fas fa-phone"></i> Call Emergency (911)
+                </button>
+                <button class="btn btn-warning" id="findHospitalBtn">
+                    <i class="fas fa-map-marker-alt"></i> Find Nearest Hospital
+                </button>
+                <button class="btn btn-primary" id="videoConsultBtn">
+                    <i class="fas fa-video"></i> Emergency Video Consult
+                </button>
+                <button class="btn btn-outline" id="closeEmergencyBtn">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+            <div style="margin-top: 20px; text-align: left; background: #fff3cd; padding: 15px; border-radius: 5px;">
+                <h4><i class="fas fa-info-circle"></i> Emergency Tips</h4>
+                <ul style="text-align: left; margin-top: 10px;">
+                    <li>Stay calm and assess the situation</li>
+                    <li>Call emergency services if there's severe bleeding, chest pain, or difficulty breathing</li>
+                    <li>Do not move someone with a suspected neck or back injury</li>
+                    <li>Keep a first aid kit accessible at all times</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Call Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-content">
+            <h2 id="videoCallTitle">Video Consultation</h2>
+            <div class="video-container">
+                <video class="video-feed" id="localVideo" autoplay muted></video>
+                <video class="video-feed" id="remoteVideo" autoplay></video>
+            </div>
+            <div class="video-controls">
+                <button class="control-btn" id="muteBtn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="control-btn" id="videoBtn">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="control-btn end-call" id="endCallBtn">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Section -->
+    <section class="section" id="confirmationSection" style="display: none;">
+        <div class="container">
+            <div class="confirmation">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2>Appointment Confirmed!</h2>
+                <p>Your appointment has been successfully booked. You will receive a confirmation email shortly.</p>
+                <div id="appointmentDetails"></div>
+                <div class="qr-code">
+                    <i class="fas fa-qrcode" style="font-size: 2rem;"></i>
+                    <div>Appointment QR Code</div>
+                </div>
+                <button class="btn btn-primary" id="newAppointmentBtn">Book Another Appointment</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>MediBook</h3>
+                    <p>Your trusted platform for booking doctor appointments online.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                        <li><a href="#" class="nav-link" data-page="doctors">Doctors</a></li>
+                        <li><a href="#" class="nav-link" data-page="appointments">Appointments</a></li>
+                        <li><a href="#" class="nav-link" data-page="reviews">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Health St, Medical City</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@medibook.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 MediBook. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeLoginModal">&times;</span>
+        <div class="modal-title">Login to MediBook</div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+            <p style="margin-top: 10px; text-align: center;">
+                Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal" id="signupModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeSignupModal">&times;</span>
+        <div class="modal-title">Sign Up for MediBook</div>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" class="form-control" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="signupConfirmPassword">Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <p style="margin-top: 10px; text-align: center;">
+                Already have an account? <a href="#" id="switchToLogin">Login</a>
+            </p>
+        </form>
+    </div>
+</div>
+<script>
+        // Enhanced sample data with doctor profiles and live status
+        const doctors = [
+            {
+                id: 1,
+                name: "Dr. Sarah Johnson",
+                specialty: "Cardiologist",
+                experience: "10 years",
+                rating: 4.5,
+                reviews: 128,
+                fee: "$150",
+                availability: "Mon, Wed, Fri",
+                languages: ["English", "Spanish"],
+                description: "Specializes in heart diseases and cardiovascular health with over 10 years of experience.",
+                about: "Dr. Sarah Johnson is a board-certified cardiologist with extensive experience in treating heart conditions. She completed her medical degree at Harvard Medical School and her residency at Johns Hopkins Hospital. Dr. Johnson is passionate about preventive cardiology and helping patients maintain heart health through lifestyle changes and medical interventions.",
+                education: [
+                    "MD - Harvard Medical School",
+                    "Residency in Cardiology - Johns Hopkins Hospital",
+                    "Fellowship in Interventional Cardiology - Mayo Clinic"
+                ],
+                specializations: [
+                    "Coronary Artery Disease",
+                    "Heart Failure",
+                    "Arrhythmias",
+                    "Preventive Cardiology"
+                ],
+                image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+                location: "Delhi",
+                isLive: true,
+                distance: "2.5 km"
+            },
+            {
+                id: 2,
+                name: "Dr. Michael Chen",
+                specialty: "Neurologist",
+                experience: "8 years",
+                rating: 5.0,
+                reviews: 94,
+                fee: "$180",
+                availability: "Tue, Thu, Sat",
+                languages: ["English", "Mandarin"],
+                description: "Expert in neurological disorders with a focus on non-invasive treatments and therapies.",
+                about: "Dr. Michael Chen is a renowned neurologist specializing in the diagnosis and treatment of complex neurological conditions. He completed his medical training at Stanford University and has published numerous research papers on neurodegenerative diseases. Dr. Chen believes in a patient-centered approach to neurology.",
+                education: [
+                    "MD - Stanford University School of Medicine",
+                    "Residency in Neurology - Massachusetts General Hospital",
+                    "Fellowship in Neuroimmunology - Cleveland Clinic"
+                ],
+                specializations: [
+                    "Migraine and Headache Disorders",
+                    "Multiple Sclerosis",
+                    "Epilepsy",
+                    "Neurodegenerative Diseases"
+                ],
+                image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+                location: "Mumbai",
+                isLive: true,
+                distance: "5.2 km"
+            },
+            {
+                id: 3,
+                name: "Dr. Emily Rodriguez",
+                specialty: "Pediatrician",
+                experience: "12 years",
+                rating: 4.0,
+                reviews: 156,
+                fee: "$120",
+                availability: "Mon-Fri",
+                languages: ["English", "Spanish"],
+                description: "Dedicated to children's health with a gentle approach and comprehensive care plans.",
+                about: "Dr. Emily Rodriguez is a compassionate pediatrician with over 12 years of experience caring for children from infancy through adolescence. She completed her pediatric residency at Boston Children's Hospital and is certified by the American Board of Pediatrics. Dr. Rodriguez is known for her gentle approach and ability to make children feel comfortable during visits.",
+                education: [
+                    "MD - University of California, San Francisco",
+                    "Residency in Pediatrics - Boston Children's Hospital",
+                    "Fellowship in Pediatric Infectious Diseases - Children's Hospital of Philadelphia"
+                ],
+                specializations: [
+                    "Well-Child Visits",
+                    "Vaccinations",
+                    "Childhood Infections",
+                    "Developmental Screening"
+                ],
+                image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80",
+                location: "Bangalore",
+                isLive: false,
+                distance: "8.7 km"
+            },
+            {
+                id: 4,
+                name: "Dr. James Wilson",
+                specialty: "Orthopedist",
+                experience: "15 years",
+                rating: 4.7,
+                reviews: 203,
+                fee: "$200",
+                availability: "Mon, Tue, Thu",
+                languages: ["English", "French"],
+                description: "Specialist in bone and joint disorders with extensive surgical experience.",
+                about: "Dr. James Wilson is an orthopedic surgeon specializing in sports injuries and joint replacement. With 15 years of experience, he has helped thousands of patients regain mobility and return to their active lifestyles. Dr. Wilson completed his orthopedic surgery residency at the Hospital for Special Surgery in New York.",
+                education: [
+                    "MD - Duke University School of Medicine",
+                    "Residency in Orthopedic Surgery - Hospital for Special Surgery",
+                    "Fellowship in Sports Medicine - Steadman Clinic"
+                ],
+                specializations: [
+                    "Knee and Hip Replacement",
+                    "Sports Injuries",
+                    "Arthroscopic Surgery",
+                    "Fracture Care"
+                ],
+                image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+                location: "Delhi",
+                isLive: true,
+                distance: "1.8 km"
+            },
+            // ... (existing doctors)
+
+{
+    id: 5,
+    name: "Dr. Shreya Roy",
+    specialty: "Gynecologist",
+    experience: "11 years",
+    rating: 4.8,
+    reviews: 142,
+    fee: "$140",
+    availability: "Mon, Wed, Fri",
+    languages: ["English", "Hindi"],
+    description: "Expert in women's health with a focus on preventive care and family planning.",
+    about: "Dr. Shreya roy is a dedicated gynecologist with over 11 years of experience in women's health. She specializes in reproductive health, prenatal care, and minimally invasive procedures. Dr. Patel is committed to providing compassionate, patient-centered care and empowering women to take control of their health.",
+    education: [
+        "MD - University of Mumbai",
+        "Residency in Gynecology - Tata Memorial Hospital",
+        "Fellowship in Reproductive Medicine - Cleveland Clinic"
+    ],
+    specializations: [
+        "Prenatal Care",
+        "Family Planning",
+        "Menopause Management",
+        "Minimally Invasive Surgery"
+    ],
+    image: "Shreya.jpeg",
+    location: "Mumbai",
+    isLive: false,
+    distance: "6.3 km"
+},
+{
+    id: 6,
+    name: "Dr. Harsh Sharma",
+    specialty: "Psychiatrist",
+    experience: "9 years",
+    rating: 4.6,
+    reviews: 98,
+    fee: "$160",
+    availability: "Tue, Thu, Sat",
+    languages: ["English", "Korean"],
+    description: "Specialist in mental health disorders with expertise in therapy and medication management.",
+    about: "Dr. Harsh Sharma is a board-certified psychiatrist with a passion for mental health advocacy. With 9 years of experience, he has helped numerous patients overcome anxiety, depression, and other mental health challenges. Dr. Kim combines evidence-based therapy with medication management to provide holistic care.",
+    education: [
+        "MD - Seoul National University",
+        "Residency in Psychiatry - Massachusetts General Hospital",
+        "Fellowship in Child and Adolescent Psychiatry - UCLA"
+    ],
+    specializations: [
+        "Anxiety Disorders",
+        "Depression",
+        "PTSD",
+        "Child Psychiatry"
+    ],
+    image: "Harsh.jpeg",
+    location: "Bangalore",
+    isLive: true,
+    distance: "4.1 km"
+},
+    // Add these to your doctors array:
+
+{
+    id: 7,
+    name: "Dr. Amanda Torres",
+    specialty: "Dentist",
+    experience: "7 years",
+    rating: 4.4,
+    reviews: 87,
+    fee: "$100",
+    availability: "Mon-Fri",
+    languages: ["English", "Spanish"],
+    description: "Specialist in dental care with expertise in cosmetic and restorative procedures.",
+    about: "Dr. Amanda Torres is a skilled dentist dedicated to improving smiles and oral health. With 7 years of experience, she specializes in preventive care, cosmetic dentistry, and dental implants. Dr. Torres believes in patient comfort and uses the latest techniques to ensure a positive experience.",
+    education: [
+        "DDS - University of Texas",
+        "Residency in Dentistry - Baylor College of Dentistry",
+        "Certification in Cosmetic Dentistry - American Academy of Cosmetic Dentistry"
+    ],
+    specializations: [
+        "Cosmetic Dentistry",
+        "Dental Implants",
+        "Orthodontics",
+        "Preventive Care"
+    ],
+    image: "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1634&q=80",
+    location: "Delhi",
+    isLive: false,
+    distance: "3.8 km"
+},
+{
+    id: 8,
+    name: "Dr. David Nguyen",
+    specialty: "Urologist",
+    experience: "13 years",
+    rating: 4.9,
+    reviews: 156,
+    fee: "$170",
+    availability: "Tue, Thu, Sat",
+    languages: ["English", "Vietnamese"],
+    description: "Expert in urinary tract disorders and male reproductive health.",
+    about: "Dr. David Nguyen is a leading urologist with 13 years of experience treating complex urological conditions. He specializes in minimally invasive surgeries and kidney stone treatments. Dr. Nguyen is committed to providing personalized care and staying at the forefront of urological advancements.",
+    education: [
+        "MD - University of California, San Francisco",
+        "Residency in Urology - Stanford Hospital",
+        "Fellowship in Endourology - Cleveland Clinic"
+    ],
+    specializations: [
+        "Kidney Stones",
+        "Prostate Health",
+        "Bladder Disorders",
+        "Minimally Invasive Surgery"
+    ],
+    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+    location: "Mumbai",
+    isLive: true,
+    distance: "5.9 km"
+},
+{
+    id: 9,
+    name: "Dr. Sophia Gupta",
+    specialty: "Endocrinologist",
+    experience: "10 years",
+    rating: 4.7,
+    reviews: 112,
+    fee: "$155",
+    availability: "Mon, Wed, Fri",
+    languages: ["English", "Hindi"],
+    description: "Specialist in hormonal disorders and diabetes management.",
+    about: "Dr. Sophia Gupta is an endocrinologist with a decade of experience in treating hormonal imbalances and metabolic disorders. She focuses on diabetes care, thyroid conditions, and osteoporosis. Dr. Gupta emphasizes lifestyle modifications and patient education for long-term health.",
+    education: [
+        "MD - All India Institute of Medical Sciences",
+        "Residency in Endocrinology - Johns Hopkins Hospital",
+        "Fellowship in Diabetes Management - Mayo Clinic"
+    ],
+    specializations: [
+        "Diabetes Management",
+        "Thyroid Disorders",
+        "Hormonal Imbalances",
+        "Osteoporosis"
+    ],
+    image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80",
+    location: "Bangalore",
+    isLive: false,
+    distance: "7.2 km"
+},
+{
+    id: 10,
+    name: "Dr. James O'Connor",
+    specialty: "Ophthalmologist",
+    experience: "15 years",
+    rating: 4.5,
+    reviews: 134,
+    fee: "$145",
+    availability: "Mon-Fri",
+    languages: ["English", "Irish"],
+    description: "Eye specialist with expertise in vision correction and retinal diseases.",
+    about: "Dr. James O'Connor is a renowned ophthalmologist with 15 years of experience in eye care. He specializes in cataract surgery, glaucoma treatment, and LASIK procedures. Dr. O'Connor is passionate about preserving and improving vision for patients of all ages.",
+    education: [
+        "MD - Trinity College Dublin",
+        "Residency in Ophthalmology - Wills Eye Hospital",
+        "Fellowship in Retina Surgery - Bascom Palmer Eye Institute"
+    ],
+    specializations: [
+        "Cataract Surgery",
+        "Glaucoma",
+        "LASIK",
+        "Retinal Diseases"
+    ],
+    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    location: "Delhi",
+    isLive: true,
+    distance: "2.1 km"
+},
+{
+    id: 11,
+    name: "Dr. Maria Santos",
+    specialty: "Dermatologist",
+    experience: "8 years",
+    rating: 4.6,
+    reviews: 98,
+    fee: "$130",
+    availability: "Tue, Thu, Sat",
+    languages: ["English", "Portuguese"],
+    description: "Skin specialist focusing on cosmetic dermatology and skin conditions.",
+    about: "Dr. Maria Santos is a dermatologist with 8 years of experience treating a wide range of skin conditions. She specializes in acne, eczema, and cosmetic procedures like Botox and fillers. Dr. Santos combines medical expertise with aesthetic care to help patients achieve healthy, beautiful skin.",
+    education: [
+        "MD - University of São Paulo",
+        "Residency in Dermatology - University of Miami",
+        "Certification in Cosmetic Dermatology - American Board of Dermatology"
+    ],
+    specializations: [
+        "Acne Treatment",
+        "Cosmetic Procedures",
+        "Skin Cancer Screening",
+        "Eczema Management"
+    ],
+    image: "https://images.unsplash.com/photo-1594824804732-ca8db723f8fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    location: "Mumbai",
+    isLive: false,
+    distance: "4.5 km"
+},
+{
+    id: 12,
+    name: "Dr. Ahmed Hassan",
+    specialty: "Oncologist",
+    experience: "12 years",
+    rating: 4.8,
+    reviews: 167,
+    fee: "$200",
+    availability: "Mon, Wed, Fri",
+    languages: ["English", "Arabic"],
+    description: "Cancer specialist with expertise in chemotherapy and radiation therapy.",
+    about: "Dr. Ahmed Hassan is a dedicated oncologist with 12 years of experience in cancer treatment and research. He specializes in breast cancer, lung cancer, and immunotherapy. Dr. Hassan works closely with patients to provide compassionate care and the latest treatment options.",
+    education: [
+        "MD - Cairo University",
+        "Residency in Oncology - Memorial Sloan Kettering",
+        "Fellowship in Medical Oncology - MD Anderson Cancer Center"
+    ],
+    specializations: [
+        "Breast Cancer",
+        "Lung Cancer",
+        "Immunotherapy",
+        "Palliative Care"
+    ],
+    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    location: "Bangalore",
+    isLive: true,
+    distance: "6.7 km"
+}
+
+        ];
+
+        // Sample reviews data
+        const reviews = [
+            {
+                id: 1,
+                doctorId: 1,
+                doctorName: "Dr. Sarah Johnson",
+                patientName: "Robert Smith",
+                rating: 5,
+                title: "Excellent cardiologist!",
+                comment: "Dr. Johnson was very thorough and explained everything clearly. She took the time to answer all my questions.",
+                date: "2023-10-15"
+            },
+            {
+                id: 2,
+                doctorId: 2,
+                doctorName: "Dr. Michael Chen",
+                patientName: "Lisa Thompson",
+                rating: 4,
+                title: "Great experience",
+                comment: "Dr. Chen was knowledgeable and professional. The wait time was a bit long but worth it.",
+                date: "2023-10-10"
+            },
+            {
+                id: 3,
+                doctorId: 3,
+                doctorName: "Dr. Emily Rodriguez",
+                patientName: "Maria Garcia",
+                rating: 5,
+                title: "Wonderful with children",
+                comment: "My daughter was nervous about her checkup, but Dr. Rodriguez made her feel comfortable and at ease.",
+                date: "2023-10-05"
+            }
+        ];
+
+        // Sample appointments data
+        let appointments = [
+            {
+                id: 1,
+                doctorId: 1,
+                doctorName: "Dr. Sarah Johnson",
+                specialty: "Cardiologist",
+                date: "2023-11-25",
+                time: "10:00 AM",
+                status: "upcoming",
+                patientName: "John Doe"
+            },
+            {
+                id: 2,
+                doctorId: 2,
+                doctorName: "Dr. Michael Chen",
+                specialty: "Neurologist",
+                date: "2023-11-20",
+                time: "2:00 PM",
+                status: "upcoming",
+                patientName: "John Doe"
+            },
+            {
+                id: 3,
+                doctorId: 3,
+                doctorName: "Dr. Emily Rodriguez",
+                specialty: "Pediatrician",
+                date: "2023-10-15",
+                time: "11:00 AM",
+                status: "completed",
+                patientName: "John Doe"
+            }
+        ];
+
+        // DOM Elements
+        const homeLink = document.getElementById('homeLink');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        const doctorsContainer = document.getElementById('doctorsContainer');
+        const allDoctorsContainer = document.getElementById('allDoctorsContainer');
+        const liveDoctorsContainer = document.getElementById('liveDoctorsContainer');
+        const comparisonSection = document.getElementById('comparisonSection');
+        const comparisonContainer = document.getElementById('comparisonContainer');
+        const bookingWizard = document.getElementById('bookingWizard');
+        const emergencyModal = document.getElementById('emergencyModal');
+        const emergencyBtn = document.getElementById('emergencyBtn');
+        const closeEmergencyBtn = document.getElementById('closeEmergencyBtn');
+        const callEmergencyBtn = document.getElementById('callEmergencyBtn');
+        const findHospitalBtn = document.getElementById('findHospitalBtn');
+        const videoConsultBtn = document.getElementById('videoConsultBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const accessibilityToggle = document.getElementById('accessibilityToggle');
+        const accessibilityPanel = document.getElementById('accessibilityPanel');
+        const highContrastToggle = document.getElementById('highContrastToggle');
+        const textSizeIncrease = document.getElementById('textSizeIncrease');
+        const textSizeDecrease = document.getElementById('textSizeDecrease');
+        const readAloud = document.getElementById('readAloud');
+        const symptomsGrid = document.getElementById('symptomsGrid');
+        const checkSymptomsBtn = document.getElementById('checkSymptomsBtn');
+        const suggestionResult = document.getElementById('suggestionResult');
+        const recommendedSpecialist = document.getElementById('recommendedSpecialist');
+        const bookSpecialistBtn = document.getElementById('bookSpecialistBtn');
+        const compareDoctorsBtn = document.getElementById('compareDoctorsBtn');
+        const closeComparisonBtn = document.getElementById('closeComparisonBtn');
+        const bookFromComparisonBtn = document.getElementById('bookFromComparisonBtn');
+        const viewAllDoctorsBtn = document.getElementById('viewAllDoctorsBtn');
+        const reviewsList = document.getElementById('reviewsList');
+        const reviewDoctorSelect = document.getElementById('reviewDoctor');
+        const ratingStars = document.getElementById('ratingStars');
+        const submitReviewBtn = document.getElementById('submitReviewBtn');
+        const upcomingAppointments = document.getElementById('upcomingAppointments');
+        const pastAppointments = document.getElementById('pastAppointments');
+        const recentAppointments = document.getElementById('recentAppointments');
+        const myReviews = document.getElementById('myReviews');
+        const totalAppointmentsEl = document.getElementById('totalAppointments');
+        const doctorsVisitedEl = document.getElementById('doctorsVisited');
+        const avgRatingEl = document.getElementById('avgRating');
+        const prescriptionsEl = document.getElementById('prescriptions');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const searchBtn = document.getElementById('searchBtn');
+        const doctorSearchBtn = document.getElementById('doctorSearchBtn');
+        const newAppointmentBtn = document.getElementById('newAppointmentBtn');
+        const doctorProfileHeader = document.getElementById('doctorProfileHeader');
+        const doctorAbout = document.getElementById('doctorAbout');
+        const doctorEducation = document.getElementById('doctorEducation');
+        const doctorSpecializations = document.getElementById('doctorSpecializations');
+        const doctorAvailability = document.getElementById('doctorAvailability');
+        const bookThisDoctorBtn = document.getElementById('bookThisDoctorBtn');
+        const videoCallBtn = document.getElementById('videoCallBtn');
+        const doctorReviewsList = document.getElementById('doctorReviewsList');
+        const videoModal = document.getElementById('videoModal');
+        const videoCallTitle = document.getElementById('videoCallTitle');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const muteBtn = document.getElementById('muteBtn');
+        const videoBtn = document.getElementById('videoBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const specialtyFilter = document.getElementById('specialtyFilter');
+        const availabilityFilter = document.getElementById('availabilityFilter');
+        const locationFilter = document.getElementById('locationFilter');
+        const ratingFilter = document.getElementById('ratingFilter');
+        // ... (existing DOM elements)
+
+// New: Login/Signup related elements
+const loginModal = document.getElementById('loginModal');
+const signupModal = document.getElementById('signupModal');
+const closeLoginModal = document.getElementById('closeLoginModal');
+const closeSignupModal = document.getElementById('closeSignupModal');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const switchToSignup = document.getElementById('switchToSignup');
+const switchToLogin = document.getElementById('switchToLogin');
+
+// New: User session state
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let users = JSON.parse(localStorage.getItem('users')) || [
+    { name: 'John Doe', email: 'john@example.com', password: 'password123' },
+    { name: 'Jane Smith', email: 'jane@example.com', password: 'password123' }
+];
+
+
+        // State variables
+        let selectedSymptoms = [];
+        let doctorsToCompare = [];
+        let currentStep = 1;
+        let selectedDoctor = null;
+        let selectedDate = null;
+        let selectedTime = null;
+        let patientMode = 'self';
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let currentRating = 0;
+        let userReviews = JSON.parse(localStorage.getItem('userReviews')) || [];
+        let userAppointments = JSON.parse(localStorage.getItem('userAppointments')) || appointments;
+        let currentDoctorProfile = null;
+        let isMuted = false;
+        let isVideoOn = true;
+
+        // Initialize the application
+        function init() {
+            renderDoctors();
+            renderAllDoctors();
+            renderLiveDoctors();
+            setupEventListeners();
+            setupWizardNavigation();
+            generateCalendar();
+            renderReviews();
+            renderAppointments();
+            renderDashboard();
+            setupNavigation();
+            setupFilters();
+            updateUserUI();
+            setupAuthModals();
+            
+            console.log("MediBook initialized successfully!");
+        }
+
+        // Setup filters
+        function setupFilters() {
+            if (specialtyFilter) {
+                specialtyFilter.addEventListener('change', filterDoctors);
+            }
+            if (availabilityFilter) {
+                availabilityFilter.addEventListener('change', filterDoctors);
+            }
+            if (locationFilter) {
+                locationFilter.addEventListener('change', filterDoctors);
+            }
+            if (ratingFilter) {
+                ratingFilter.addEventListener('change', filterDoctors);
+            }
+        }
+
+        // Filter doctors based on selected criteria
+        function filterDoctors() {
+            const specialty = specialtyFilter.value;
+            const availability = availabilityFilter.value;
+            const location = locationFilter.value;
+            const rating = parseFloat(ratingFilter.value);
+            
+            let filteredDoctors = [...doctors];
+            
+            // Filter by specialty
+            if (specialty) {
+                filteredDoctors = filteredDoctors.filter(doctor => doctor.specialty === specialty);
+            }
+            
+            // Filter by location
+            if (location) {
+                if (location === 'nearby') {
+                    filteredDoctors = filteredDoctors.filter(doctor => parseFloat(doctor.distance) < 10);
+                } else {
+                    filteredDoctors = filteredDoctors.filter(doctor => doctor.location === location);
+                }
+            }
+            
+            // Filter by rating
+            if (rating > 0) {
+                filteredDoctors = filteredDoctors.filter(doctor => doctor.rating >= rating);
+            }
+            
+            // Filter by availability (simplified)
+            if (availability) {
+                filteredDoctors = filteredDoctors.filter(doctor => doctor.isLive);
+            }
+            
+            renderFilteredDoctors(filteredDoctors);
+        }
+
+        // Render filtered doctors
+        function renderFilteredDoctors(filteredDoctors) {
+            if (!allDoctorsContainer) return;
+            
+            allDoctorsContainer.innerHTML = '';
+            
+            if (filteredDoctors.length === 0) {
+                allDoctorsContainer.innerHTML = '<p>No doctors match your filters. Try adjusting your criteria.</p>';
+                return;
+            }
+            
+            filteredDoctors.forEach(doctor => {
+                const doctorCard = createDoctorCard(doctor);
+                allDoctorsContainer.appendChild(doctorCard);
+            });
+        }
+        function performDoctorSearch(query) {
+    const filteredDoctors = doctors.filter(doctor => 
+        doctor.name.toLowerCase().includes(query.toLowerCase()) ||
+        doctor.specialty.toLowerCase().includes(query.toLowerCase()) ||
+        doctor.description.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    renderFilteredDoctors(filteredDoctors);
+    
+    if (filteredDoctors.length === 0) {
+        const allDoctorsContainer = document.getElementById('allDoctorsContainer');
+        if (allDoctorsContainer) {
+            allDoctorsContainer.innerHTML = '<p>No doctors match your search. Try different keywords.</p>';
+        }
+    }
+}
+
+        // Setup page navigation
+        function setupNavigation() {
+            // Navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    navigateToPage(pageId);
+                });
+            });
+
+            // Home logo link
+            homeLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateToPage('home');
+            });
+
+            // View all doctors button
+            viewAllDoctorsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateToPage('doctors');
+            });
+        }
+
+        // Navigate to specific page
+        function navigateToPage(pageId) {
+            console.log("Navigating to:", pageId);
+            
+            // Hide all pages
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            } else {
+                console.error("Page not found:", pageId);
+            }
+
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Render doctors in the home page
+        function renderDoctors() {
+            if (!doctorsContainer) return;
+            
+            doctorsContainer.innerHTML = '';
+            // Show only 2 doctors on home page
+            const homeDoctors = doctors.slice(0, 2);
+            
+            homeDoctors.forEach(doctor => {
+                const doctorCard = createDoctorCard(doctor);
+                doctorsContainer.appendChild(doctorCard);
+            });
+        }
+
+        // Render all doctors in doctors page
+        function renderAllDoctors() {
+            if (!allDoctorsContainer) return;
+            
+            allDoctorsContainer.innerHTML = '';
+            
+            doctors.forEach(doctor => {
+                const doctorCard = createDoctorCard(doctor);
+                allDoctorsContainer.appendChild(doctorCard);
+            });
+
+            // Populate doctor select in review form
+            if (reviewDoctorSelect) {
+                reviewDoctorSelect.innerHTML = '<option value="">Choose a doctor</option>';
+                doctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.id;
+                    option.textContent = `${doctor.name} - ${doctor.specialty}`;
+                    reviewDoctorSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Render live doctors
+        function renderLiveDoctors() {
+            if (!liveDoctorsContainer) return;
+            
+            liveDoctorsContainer.innerHTML = '';
+            
+            const liveDoctors = doctors.filter(doctor => doctor.isLive);
+            
+            if (liveDoctors.length === 0) {
+                liveDoctorsContainer.innerHTML = '<p>No doctors are currently available for immediate consultation.</p>';
+                return;
+            }
+            
+            liveDoctors.forEach(doctor => {
+                const doctorCard = createDoctorCard(doctor, true);
+                liveDoctorsContainer.appendChild(doctorCard);
+            });
+        }
+
+        // Create doctor card element
+        function createDoctorCard(doctor, isLive = false) {
+            const doctorCard = document.createElement('div');
+            doctorCard.className = 'doctor-card';
+            doctorCard.innerHTML = `
+                <div class="doctor-img">
+                    ${doctor.image ? `<img src="${doctor.image}" alt="${doctor.name}">` : '<i class="fas fa-user-md"></i>'}
+                    ${isLive ? '<span class="live-indicator"><i class="fas fa-circle"></i> LIVE</span>' : ''}
+                </div>
+                <div class="doctor-info">
+                    <h3>${doctor.name}</h3>
+                    <p class="doctor-specialty">${doctor.specialty}</p>
+                    <div class="doctor-rating">
+                        ${renderStars(doctor.rating)}
+                        <span>${doctor.rating} (${doctor.reviews} reviews)</span>
+                    </div>
+                    <p>${doctor.description}</p>
+                    <div class="doctor-details">
+                        <p><strong>Experience:</strong> ${doctor.experience}</p>
+                        <p><strong>Consultation Fee:</strong> ${doctor.fee}</p>
+                        <p><strong>Availability:</strong> ${doctor.availability}</p>
+                        <p><strong>Languages:</strong> ${doctor.languages.join(', ')}</p>
+                        <p><strong>Location:</strong> ${doctor.location} (${doctor.distance})</p>
+                    </div>
+                    <div class="doctor-actions">
+                        <button class="btn btn-outline btn-sm view-profile-btn" data-id="${doctor.id}">View Profile</button>
+                        <button class="btn btn-primary btn-sm book-btn" data-id="${doctor.id}">Book Now</button>
+                        ${isLive ? `<button class="btn btn-success btn-sm video-consult-btn" data-id="${doctor.id}"><i class="fas fa-video"></i> Consult Now</button>` : ''}
+                        <button class="compare-btn" data-id="${doctor.id}">Compare</button>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners to doctor cards
+            const expandCard = () => {
+                doctorCard.classList.toggle('expanded');
+            };
+
+            doctorCard.addEventListener('click', function(e) {
+                if (!e.target.closest('.doctor-actions')) {
+                    expandCard();
+                }
+            });
+
+            const compareBtn = doctorCard.querySelector('.compare-btn');
+            compareBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const doctorId = parseInt(this.getAttribute('data-id'));
+                toggleDoctorComparison(doctorId);
+            });
+
+            const bookBtn = doctorCard.querySelector('.book-btn');
+            bookBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const doctorId = parseInt(this.getAttribute('data-id'));
+                startBookingWizard(doctorId);
+            });
+
+            const viewProfileBtn = doctorCard.querySelector('.view-profile-btn');
+            viewProfileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const doctorId = parseInt(this.getAttribute('data-id'));
+                showDoctorProfile(doctorId);
+            });
+
+            const videoConsultBtn = doctorCard.querySelector('.video-consult-btn');
+            if (videoConsultBtn) {
+                videoConsultBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const doctorId = parseInt(this.getAttribute('data-id'));
+                    startVideoCall(doctorId);
+                });
+            }
+
+            return doctorCard;
+        }
+
+        // Show doctor profile page
+        function showDoctorProfile(doctorId) {
+            const doctor = doctors.find(d => d.id === doctorId);
+            if (!doctor) return;
+            
+            currentDoctorProfile = doctor;
+            
+            // Update profile header
+            if (doctorProfileHeader) {
+                doctorProfileHeader.innerHTML = `
+                    <div class="profile-image">
+                        ${doctor.image ? `<img src="${doctor.image}" alt="${doctor.name}">` : '<i class="fas fa-user-md"></i>'}
+                    </div>
+                    <div class="profile-info">
+                        <h1>${doctor.name}</h1>
+                        <p class="specialty">${doctor.specialty}</p>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-value">${doctor.experience}</div>
+                                <div class="stat-label">Experience</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${doctor.rating}</div>
+                                <div class="stat-label">Rating</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${doctor.reviews}</div>
+                                <div class="stat-label">Reviews</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${doctor.fee}</div>
+                                <div class="stat-label">Consultation</div>
+                            </div>
+                        </div>
+                        <div class="doctor-rating">
+                            ${renderStars(doctor.rating)}
+                        </div>
+                        <p><strong>Languages:</strong> ${doctor.languages.join(', ')}</p>
+                        <p><strong>Location:</strong> ${doctor.location} (${doctor.distance})</p>
+                    </div>
+                `;
+            }
+            
+            // Update profile details
+            if (doctorAbout) doctorAbout.textContent = doctor.about;
+            
+            if (doctorEducation) {
+                doctorEducation.innerHTML = '';
+                doctor.education.forEach(edu => {
+                    const li = document.createElement('li');
+                    li.textContent = edu;
+                    doctorEducation.appendChild(li);
+                });
+            }
+            
+            if (doctorSpecializations) {
+                doctorSpecializations.innerHTML = '';
+                doctor.specializations.forEach(spec => {
+                    const li = document.createElement('li');
+                    li.textContent = spec;
+                    doctorSpecializations.appendChild(li);
+                });
+            }
+            
+            if (doctorAvailability) {
+                doctorAvailability.innerHTML = `
+                    <p><strong>Available:</strong> ${doctor.availability}</p>
+                    <p><strong>Consultation Fee:</strong> ${doctor.fee}</p>
+                    ${doctor.isLive ? '<p><span class="live-indicator"><i class="fas fa-circle"></i> Currently Available for Video Consult</span></p>' : ''}
+                `;
+            }
+            
+            // Update doctor reviews
+            if (doctorReviewsList) {
+                const doctorReviews = [...reviews, ...userReviews].filter(r => r.doctorId === doctorId);
+                doctorReviewsList.innerHTML = '';
+                
+                if (doctorReviews.length === 0) {
+                    doctorReviewsList.innerHTML = '<p>No reviews yet for this doctor.</p>';
+                } else {
+                    doctorReviews.forEach(review => {
+                        const reviewCard = document.createElement('div');
+                        reviewCard.className = 'review-card';
+                        reviewCard.innerHTML = `
+                            <div class="review-header">
+                                <div>
+                                    <div class="reviewer-name">${review.patientName}</div>
+                                    <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                                </div>
+                                <div class="review-rating">
+                                    ${renderStars(review.rating)}
+                                </div>
+                            </div>
+                            <h4>${review.title}</h4>
+                            <p>${review.comment}</p>
+                        `;
+                        doctorReviewsList.appendChild(reviewCard);
+                    });
+                }
+            }
+            
+            // Navigate to doctor profile page
+            navigateToPage('doctorProfile');
+        }
+
+        // Start video call
+        function startVideoCall(doctorId) {
+            const doctor = doctors.find(d => d.id === doctorId);
+            if (!doctor) return;
+            
+            if (videoCallTitle) videoCallTitle.textContent = `Video Consultation with ${doctor.name}`;
+            if (videoModal) videoModal.style.display = 'flex';
+            
+            // Simulate video call (in a real app, this would use WebRTC)
+            alert(`Starting video call with ${doctor.name}. In a real application, this would connect via WebRTC.`);
+        }
+
+        // Render stars based on rating
+        function renderStars(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            if (halfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+
+        // Toggle doctor for comparison
+        function toggleDoctorComparison(doctorId) {
+            const index = doctorsToCompare.indexOf(doctorId);
+            if (index === -1) {
+                if (doctorsToCompare.length < 3) {
+                    doctorsToCompare.push(doctorId);
+                    alert(`Added ${doctors.find(d => d.id === doctorId).name} to comparison`);
+                } else {
+                    alert('You can compare up to 3 doctors at a time.');
+                    return;
+                }
+            } else {
+                doctorsToCompare.splice(index, 1);
+                alert(`Removed ${doctors.find(d => d.id === doctorId).name} from comparison`);
+            }
+            
+            updateComparisonUI();
+        }
+
+        // Update comparison UI
+        function updateComparisonUI() {
+            if (!comparisonContainer) return;
+            
+            comparisonContainer.innerHTML = '';
+            
+            if (doctorsToCompare.length === 0) {
+                comparisonSection.style.display = 'none';
+                return;
+            }
+            
+            comparisonSection.style.display = 'block';
+            
+            doctorsToCompare.forEach(doctorId => {
+                const doctor = doctors.find(d => d.id === doctorId);
+                const comparisonCard = document.createElement('div');
+                comparisonCard.className = 'comparison-card';
+                comparisonCard.innerHTML = `
+                    <div class="comparison-header">
+                        <h3>${doctor.name}</h3>
+                        <button class="compare-btn remove-compare" data-id="${doctor.id}">Remove</button>
+                    </div>
+                    <p class="doctor-specialty">${doctor.specialty}</p>
+                    <ul class="comparison-features">
+                        <li><span class="feature-name">Experience</span><span class="feature-value">${doctor.experience}</span></li>
+                        <li><span class="feature-name">Rating</span><span class="feature-value">${doctor.rating}/5</span></li>
+                        <li><span class="feature-name">Consultation Fee</span><span class="feature-value">${doctor.fee}</span></li>
+                        <li><span class="feature-name">Availability</span><span class="feature-value">${doctor.availability}</span></li>
+                        <li><span class="feature-name">Languages</span><span class="feature-value">${doctor.languages.join(', ')}</span></li>
+                        <li><span class="feature-name">Location</span><span class="feature-value">${doctor.location}</span></li>
+                    </ul>
+                    <button class="btn btn-primary btn-sm select-doctor" data-id="${doctor.id}" style="width: 100%; margin-top: 15px;">Select This Doctor</button>
+                `;
+                comparisonContainer.appendChild(comparisonCard);
+            });
+            
+            // Add event listeners to comparison cards
+            document.querySelectorAll('.remove-compare').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const doctorId = parseInt(this.getAttribute('data-id'));
+                    const index = doctorsToCompare.indexOf(doctorId);
+                    if (index !== -1) {
+                        doctorsToCompare.splice(index, 1);
+                        updateComparisonUI();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.select-doctor').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const doctorId = parseInt(this.getAttribute('data-id'));
+                    startBookingWizard(doctorId);
+                });
+            });
+        }
+
+        // Start booking wizard
+        function startBookingWizard(doctorId) {
+            selectedDoctor = doctors.find(d => d.id === doctorId);
+            if (bookingWizard) {
+                bookingWizard.style.display = 'block';
+            }
+            navigateToPage('appointments');
+            if (bookingWizard) {
+                bookingWizard.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Setup wizard navigation
+        function setupWizardNavigation() {
+            // Patient mode selection
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    patientMode = this.getAttribute('data-mode');
+                });
+            });
+
+            // Step navigation
+            const nextToStep2Btn = document.getElementById('nextToStep2Btn');
+            const backToStep1Btn = document.getElementById('backToStep1Btn');
+            const nextToStep3Btn = document.getElementById('nextToStep3Btn');
+            const backToStep2Btn = document.getElementById('backToStep2Btn');
+            const nextToStep4Btn = document.getElementById('nextToStep4Btn');
+            const backToStep3Btn = document.getElementById('backToStep3Btn');
+            const confirmBookingBtn = document.getElementById('confirmBookingBtn');
+
+            if (nextToStep2Btn) nextToStep2Btn.addEventListener('click', () => navigateToStep(2));
+            if (backToStep1Btn) backToStep1Btn.addEventListener('click', () => navigateToStep(1));
+            if (nextToStep3Btn) nextToStep3Btn.addEventListener('click', () => navigateToStep(3));
+            if (backToStep2Btn) backToStep2Btn.addEventListener('click', () => navigateToStep(2));
+            if (nextToStep4Btn) nextToStep4Btn.addEventListener('click', () => navigateToStep(4));
+            if (backToStep3Btn) backToStep3Btn.addEventListener('click', () => navigateToStep(3));
+            if (confirmBookingBtn) confirmBookingBtn.addEventListener('click', confirmAppointment);
+
+            // Calendar navigation
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+            
+            if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+            if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => changeMonth(1));
+        }
+
+        // Navigate to specific step in wizard
+        function navigateToStep(step) {
+            // Update progress bar
+            document.querySelectorAll('.progress-step').forEach(stepEl => {
+                if (parseInt(stepEl.getAttribute('data-step')) <= step) {
+                    stepEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active');
+                }
+            });
+
+            // Update progress bar line
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.setProperty('--progress-width', `${((step - 1) / 3) * 100}%`);
+            }
+
+            // Show/hide steps
+            document.querySelectorAll('.wizard-step').forEach(stepEl => {
+                stepEl.classList.remove('active');
+            });
+            const currentStepEl = document.getElementById(`step${step}`);
+            if (currentStepEl) {
+                currentStepEl.classList.add('active');
+            }
+
+            // Update content based on step
+            if (step === 2) {
+                renderWizardDoctors();
+            } else if (step === 3) {
+                generateCalendar();
+            } else if (step === 4) {
+                renderConfirmationDetails();
+            }
+
+            currentStep = step;
+        }
+
+        // Render doctors in wizard step 2
+        function renderWizardDoctors() {
+            const wizardDoctors = document.getElementById('wizardDoctors');
+            if (!wizardDoctors) return;
+            
+            wizardDoctors.innerHTML = '';
+
+            doctors.forEach(doctor => {
+                const doctorCard = document.createElement('div');
+                doctorCard.className = `doctor-card ${selectedDoctor && selectedDoctor.id === doctor.id ? 'expanded' : ''}`;
+                doctorCard.innerHTML = `
+                    <div class="doctor-img">
+                        ${doctor.image ? `<img src="${doctor.image}" alt="${doctor.name}">` : '<i class="fas fa-user-md"></i>'}
+                    </div>
+                    <div class="doctor-info">
+                        <h3>${doctor.name}</h3>
+                        <p class="doctor-specialty">${doctor.specialty}</p>
+                        <div class="doctor-rating">
+                            ${renderStars(doctor.rating)}
+                            <span>${doctor.rating} (${doctor.reviews} reviews)</span>
+                        </div>
+                        <p>${doctor.description}</p>
+                        <div class="doctor-details">
+                            <p><strong>Experience:</strong> ${doctor.experience}</p>
+                            <p><strong>Consultation Fee:</strong> ${doctor.fee}</p>
+                            <p><strong>Availability:</strong> ${doctor.availability}</p>
+                            <p><strong>Languages:</strong> ${doctor.languages.join(', ')}</p>
+                        </div>
+                        <div class="doctor-actions">
+                            <button class="btn btn-primary btn-sm select-wizard-doctor" data-id="${doctor.id}">
+                                ${selectedDoctor && selectedDoctor.id === doctor.id ? 'Selected' : 'Select'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                wizardDoctors.appendChild(doctorCard);
+            });
+
+            // Add event listeners to wizard doctor cards
+            document.querySelectorAll('.select-wizard-doctor').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const doctorId = parseInt(this.getAttribute('data-id'));
+                    selectedDoctor = doctors.find(d => d.id === doctorId);
+                    
+                    // Update all buttons
+                    document.querySelectorAll('.select-wizard-doctor').forEach(b => {
+                        const id = parseInt(b.getAttribute('data-id'));
+                        b.textContent = id === doctorId ? 'Selected' : 'Select';
+                    });
+                    
+                    // Expand selected card
+                    document.querySelectorAll('.doctor-card').forEach(card => {
+                        const id = parseInt(card.querySelector('.select-wizard-doctor').getAttribute('data-id'));
+                        if (id === doctorId) {
+                            card.classList.add('expanded');
+                        } else {
+                            card.classList.remove('expanded');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Generate calendar
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const currentMonthElement = document.getElementById('currentMonth');
+            
+            if (!calendarGrid || !currentMonthElement) return;
+            
+            // Set current month text
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Clear previous calendar
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-date';
+                calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Add days of the month
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateElement = document.createElement('div');
+                dateElement.className = 'calendar-date available';
+                dateElement.textContent = i;
+                
+                // Mark today
+                if (currentYear === today.getFullYear() && 
+                    currentMonth === today.getMonth() && 
+                    i === today.getDate()) {
+                    dateElement.classList.add('selected');
+                    selectedDate = new Date(currentYear, currentMonth, i);
+                }
+                
+                dateElement.addEventListener('click', function() {
+                    if (this.classList.contains('available')) {
+                        document.querySelectorAll('.calendar-date').forEach(d => d.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedDate = new Date(currentYear, currentMonth, i);
+                        generateTimeSlots();
+                    }
+                });
+                
+                calendarGrid.appendChild(dateElement);
+            }
+            
+            // Generate time slots if a date is selected
+            if (selectedDate) {
+                generateTimeSlots();
+            }
+        }
+
+        // Change month in calendar
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar();
+        }
+
+        // Generate time slots
+        function generateTimeSlots() {
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            if (!timeSlotsContainer) return;
+            
+            timeSlotsContainer.innerHTML = '';
+            
+            const times = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
+            
+            times.forEach(time => {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = time;
+                
+                timeSlot.addEventListener('click', function() {
+                    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedTime = time;
+                });
+                
+                timeSlotsContainer.appendChild(timeSlot);
+            });
+        }
+
+        // Render confirmation details
+        function renderConfirmationDetails() {
+            const confirmationDetails = document.getElementById('confirmationDetails');
+            if (!confirmationDetails) return;
+            
+            const patientName = document.getElementById('patientName')?.value || 'Not provided';
+            const patientAge = document.getElementById('patientAge')?.value || 'Not provided';
+            const patientGender = document.getElementById('patientGender')?.value || 'Not provided';
+            
+            let modeText = '';
+            switch(patientMode) {
+                case 'self': modeText = 'Yourself'; break;
+                case 'child': modeText = 'Your Child'; break;
+                case 'parent': modeText = 'Your Parent'; break;
+                case 'other': modeText = 'Someone Else'; break;
+            }
+            
+            confirmationDetails.innerHTML = `
+                <div style="background: var(--primary-light); padding: 20px; border-radius: var(--border-radius);">
+                    <h4>Appointment Details</h4>
+                    <p><strong>Patient:</strong> ${patientName} (${modeText})</p>
+                    <p><strong>Age:</strong> ${patientAge}</p>
+                    <p><strong>Gender:</strong> ${patientGender}</p>
+                    <p><strong>Doctor:</strong> ${selectedDoctor?.name || 'Not selected'} - ${selectedDoctor?.specialty || ''}</p>
+                    <p><strong>Date:</strong> ${selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not selected'}</p>
+                    <p><strong>Time:</strong> ${selectedTime || 'Not selected'}</p>
+                    <p><strong>Consultation Fee:</strong> ${selectedDoctor?.fee || ''}</p>
+                </div>
+            `;
+        }
+
+        // Confirm appointment
+        function confirmAppointment() {
+            const patientName = document.getElementById('patientName')?.value || 'Unknown Patient';
+            
+            // Create new appointment
+            const newAppointment = {
+                id: userAppointments.length + 1,
+                doctorId: selectedDoctor?.id || 0,
+                doctorName: selectedDoctor?.name || 'Unknown Doctor',
+                specialty: selectedDoctor?.specialty || 'General',
+                date: selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                time: selectedTime || '10:00 AM',
+                status: "upcoming",
+                patientName: patientName
+            };
+            
+            userAppointments.push(newAppointment);
+            localStorage.setItem('userAppointments', JSON.stringify(userAppointments));
+            
+            // Hide wizard and show confirmation
+            if (bookingWizard) {
+                bookingWizard.style.display = 'none';
+            }
+            const confirmationSection = document.getElementById('confirmationSection');
+            if (confirmationSection) {
+                confirmationSection.style.display = 'block';
+            }
+            
+            // Update confirmation details
+            const appointmentDetails = document.getElementById('appointmentDetails');
+            if (appointmentDetails) {
+                appointmentDetails.innerHTML = `
+                    <p><strong>Appointment for:</strong> ${patientName}</p>
+                    <p><strong>Doctor:</strong> ${selectedDoctor?.name || 'Unknown Doctor'}</p>
+                    <p><strong>Date:</strong> ${selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not specified'}</p>
+                    <p><strong>Time:</strong> ${selectedTime || 'Not specified'}</p>
+                `;
+            }
+            
+            // Update appointments list
+            renderAppointments();
+            renderDashboard();
+            
+            // Scroll to confirmation
+            if (confirmationSection) {
+                confirmationSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            alert('Appointment booked successfully!');
+        }
+
+        // Render reviews
+        function renderReviews() {
+            if (!reviewsList) return;
+            
+            reviewsList.innerHTML = '';
+            const allReviews = [...reviews, ...userReviews];
+            
+            if (allReviews.length === 0) {
+                reviewsList.innerHTML = '<p>No reviews yet. Be the first to leave a review!</p>';
+                return;
+            }
+            
+            allReviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                reviewCard.innerHTML = `
+                    <div class="review-header">
+                        <div>
+                            <div class="reviewer-name">${review.patientName}</div>
+                            <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="review-rating">
+                            ${renderStars(review.rating)}
+                        </div>
+                    </div>
+                    <h4>${review.title}</h4>
+                    <p>${review.comment}</p>
+                    <p><strong>Doctor:</strong> ${review.doctorName}</p>
+                `;
+                reviewsList.appendChild(reviewCard);
+            });
+        }
+
+        // Render appointments
+        function renderAppointments() {
+            if (!upcomingAppointments || !pastAppointments) return;
+            
+            upcomingAppointments.innerHTML = '';
+            pastAppointments.innerHTML = '';
+            
+            const upcoming = userAppointments.filter(apt => apt.status === 'upcoming');
+            const past = userAppointments.filter(apt => apt.status === 'completed');
+            
+            if (upcoming.length === 0) {
+                upcomingAppointments.innerHTML = '<p>No upcoming appointments.</p>';
+            } else {
+                upcoming.forEach(apt => {
+                    const aptElement = createAppointmentElement(apt);
+                    upcomingAppointments.appendChild(aptElement);
+                });
+            }
+            
+            if (past.length === 0) {
+                pastAppointments.innerHTML = '<p>No past appointments.</p>';
+            } else {
+                past.forEach(apt => {
+                    const aptElement = createAppointmentElement(apt);
+                    pastAppointments.appendChild(aptElement);
+                });
+            }
+        }
+
+        // Create appointment element
+        function createAppointmentElement(apt) {
+            const aptElement = document.createElement('div');
+            aptElement.className = 'appointment-item';
+            aptElement.innerHTML = `
+                <div class="appointment-info">
+                    <h4>${apt.doctorName}</h4>
+                    <p>${apt.specialty}</p>
+                    <p>${new Date(apt.date).toLocaleDateString()} at ${apt.time}</p>
+                </div>
+                <div class="appointment-actions">
+                    ${apt.status === 'upcoming' ? 
+                        `<button class="btn btn-outline btn-sm reschedule-btn" data-id="${apt.id}">Reschedule</button>
+                         <button class="btn btn-danger btn-sm cancel-btn" data-id="${apt.id}">Cancel</button>` : 
+                        `<button class="btn btn-success btn-sm review-btn" data-id="${apt.id}" data-doctor="${apt.doctorName}">Write Review</button>`
+                    }
+                </div>
+            `;
+            
+            // Add event listener to review button
+            const reviewBtn = aptElement.querySelector('.review-btn');
+            if (reviewBtn) {
+                reviewBtn.addEventListener('click', function() {
+                    const doctorName = this.getAttribute('data-doctor');
+                    navigateToPage('reviews');
+                    // Pre-select the doctor in the review form
+                    setTimeout(() => {
+                        const reviewDoctorSelect = document.getElementById('reviewDoctor');
+                        if (reviewDoctorSelect) {
+                            const doctorOption = Array.from(reviewDoctorSelect.options).find(opt => opt.text.includes(doctorName));
+                            if (doctorOption) {
+                                reviewDoctorSelect.value = doctorOption.value;
+                            }
+                        }
+                    }, 100);
+                });
+            }
+            
+            return aptElement;
+        }
+
+        // Render dashboard
+        function renderDashboard() {
+            // Calculate dashboard stats
+            const totalAppts = userAppointments.length;
+            const uniqueDoctors = [...new Set(userAppointments.map(apt => apt.doctorId))].length;
+            const userReviewRatings = userReviews.map(r => r.rating);
+            const avgUserRating = userReviewRatings.length > 0 ? 
+                (userReviewRatings.reduce((a, b) => a + b, 0) / userReviewRatings.length).toFixed(1) : '0.0';
+            const prescriptionCount = userAppointments.filter(apt => apt.status === 'completed').length;
+            
+            // Update dashboard cards
+            if (totalAppointmentsEl) totalAppointmentsEl.textContent = totalAppts;
+            if (doctorsVisitedEl) doctorsVisitedEl.textContent = uniqueDoctors;
+            if (avgRatingEl) avgRatingEl.textContent = avgUserRating;
+            if (prescriptionsEl) prescriptionsEl.textContent = prescriptionCount;
+            
+            // Render recent appointments
+            if (recentAppointments) {
+                recentAppointments.innerHTML = '';
+                const recent = userAppointments.slice(0, 3);
+                if (recent.length === 0) {
+                    recentAppointments.innerHTML = '<p>No recent appointments.</p>';
+                } else {
+                    recent.forEach(apt => {
+                        const aptElement = createAppointmentElement(apt);
+                        recentAppointments.appendChild(aptElement);
+                    });
+                }
+            }
+            
+            // Render user's reviews
+            if (myReviews) {
+                myReviews.innerHTML = '';
+                if (userReviews.length === 0) {
+                    myReviews.innerHTML = '<p>You haven\'t written any reviews yet.</p>';
+                } else {
+                    userReviews.forEach(review => {
+                        const reviewCard = document.createElement('div');
+                        reviewCard.className = 'review-card';
+                        reviewCard.innerHTML = `
+                            <div class="review-header">
+                                <div>
+                                    <div class="reviewer-name">You</div>
+                                    <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                                </div>
+                                <div class="review-rating">
+                                    ${renderStars(review.rating)}
+                                </div>
+                            </div>
+                            <h4>${review.title}</h4>
+                            <p>${review.comment}</p>
+                            <p><strong>Doctor:</strong> ${review.doctorName}</p>
+                        `;
+                        myReviews.appendChild(reviewCard);
+                    });
+                }
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Emergency button
+            if (emergencyBtn) {
+                emergencyBtn.addEventListener('click', () => {
+                    if (emergencyModal) emergencyModal.style.display = 'flex';
+                });
+            }
+
+            // Close emergency modal
+            if (closeEmergencyBtn) {
+                closeEmergencyBtn.addEventListener('click', () => {
+                    if (emergencyModal) emergencyModal.style.display = 'none';
+                });
+            }
+
+            // Emergency actions
+            if (callEmergencyBtn) {
+                callEmergencyBtn.addEventListener('click', () => {
+                    alert('Calling emergency services... (This is a simulation)');
+                });
+            }
+
+            if (findHospitalBtn) {
+                findHospitalBtn.addEventListener('click', () => {
+                    alert('Finding nearest hospital... (This is a simulation)');
+                });
+            }
+
+            if (videoConsultBtn) {
+                videoConsultBtn.addEventListener('click', () => {
+                    // Find available doctors for emergency video consult
+                    const availableDoctors = doctors.filter(doctor => doctor.isLive);
+                    if (availableDoctors.length > 0) {
+                        const randomDoctor = availableDoctors[Math.floor(Math.random() * availableDoctors.length)];
+                        startVideoCall(randomDoctor.id);
+                        if (emergencyModal) emergencyModal.style.display = 'none';
+                    } else {
+                        alert('No doctors are currently available for emergency consultation. Please try calling emergency services.');
+                    }
+                });
+            }
+
+            // Video call controls
+            if (muteBtn) {
+                muteBtn.addEventListener('click', () => {
+                    isMuted = !isMuted;
+                    muteBtn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+                    alert(isMuted ? 'Microphone muted' : 'Microphone unmuted');
+                });
+            }
+
+            if (videoBtn) {
+                videoBtn.addEventListener('click', () => {
+                    isVideoOn = !isVideoOn;
+                    videoBtn.innerHTML = isVideoOn ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+                    alert(isVideoOn ? 'Video turned on' : 'Video turned off');
+                });
+            }
+
+            if (endCallBtn) {
+                endCallBtn.addEventListener('click', () => {
+                    if (videoModal) videoModal.style.display = 'none';
+                    alert('Call ended');
+                });
+            }
+
+            // Video call button on doctor profile
+            if (videoCallBtn) {
+                videoCallBtn.addEventListener('click', () => {
+                    if (currentDoctorProfile) {
+                        startVideoCall(currentDoctorProfile.id);
+                    }
+                });
+            }
+
+            // Theme toggle
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const isDark = document.body.getAttribute('data-theme') === 'dark';
+                    document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                    themeToggle.innerHTML = isDark ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+                });
+            }
+
+            // Accessibility panel toggle
+            if (accessibilityToggle) {
+                accessibilityToggle.addEventListener('click', () => {
+                    if (accessibilityPanel) {
+                        accessibilityPanel.style.display = accessibilityPanel.style.display === 'block' ? 'none' : 'block';
+                    }
+                });
+            }
+
+            // High contrast toggle
+            if (highContrastToggle) {
+                highContrastToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('high-contrast');
+                });
+            }
+
+            // Text size controls
+            if (textSizeIncrease) {
+                textSizeIncrease.addEventListener('click', () => {
+                    document.body.style.fontSize = '110%';
+                });
+            }
+
+            if (textSizeDecrease) {
+                textSizeDecrease.addEventListener('click', () => {
+                    document.body.style.fontSize = '90%';
+                });
+            }
+
+            // Read aloud (simulated)
+            if (readAloud) {
+                readAloud.addEventListener('click', () => {
+                    alert('Read aloud feature would read the page content here. This is a simulation.');
+                });
+            }
+
+            // Symptom checker
+            if (symptomsGrid) {
+                symptomsGrid.querySelectorAll('.symptom-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        this.classList.toggle('selected');
+                    });
+                });
+            }
+
+            if (checkSymptomsBtn) {
+                checkSymptomsBtn.addEventListener('click', () => {
+                    const selected = document.querySelectorAll('.symptom-option.selected');
+                    if (selected.length === 0) {
+                        alert('Please select at least one symptom.');
+                        return;
+                    }
+
+                    // Simple symptom to specialist mapping
+                    const symptomSpecialistMap = {
+                        'Cough': 'Pulmonologist',
+                        'Skin Rash': 'Dermatologist',
+                        'Headache': 'Neurologist',
+                        'Stomach Pain': 'Gastroenterologist',
+                        'Chest Pain': 'Cardiologist',
+                        'Joint Pain': 'Orthopedist',
+                        'Ear Pain': 'ENT Specialist',
+                        'Vision Problems': 'Ophthalmologist'
+                    };
+
+                    // For multiple symptoms, pick the first one's specialist
+                    const firstSymptom = selected[0].textContent;
+                    const specialist = symptomSpecialistMap[firstSymptom] || 'General Physician';
+
+                    if (recommendedSpecialist) recommendedSpecialist.textContent = specialist;
+                    if (suggestionResult) suggestionResult.style.display = 'block';
+                });
+            }
+
+            if (bookSpecialistBtn) {
+                bookSpecialistBtn.addEventListener('click', () => {
+                    const specialist = recommendedSpecialist?.textContent || '';
+                    const matchingDoctor = doctors.find(d => d.specialty === specialist);
+                    
+                    if (matchingDoctor) {
+                        startBookingWizard(matchingDoctor.id);
+                    } else {
+                        alert(`No ${specialist} available at the moment. Please try another specialist or check back later.`);
+                    }
+                });
+            }
+
+            // Compare doctors button
+            if (compareDoctorsBtn) {
+                compareDoctorsBtn.addEventListener('click', () => {
+                    if (doctorsToCompare.length === 0) {
+                        alert('Please select at least one doctor to compare by clicking the "Compare" button on doctor cards.');
+                        return;
+                    }
+                    if (comparisonSection) {
+                        comparisonSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+
+            // Close comparison
+            if (closeComparisonBtn) {
+                closeComparisonBtn.addEventListener('click', () => {
+                    if (comparisonSection) comparisonSection.style.display = 'none';
+                });
+            }
+
+            // Book from comparison
+            if (bookFromComparisonBtn) {
+                bookFromComparisonBtn.addEventListener('click', () => {
+                    if (doctorsToCompare.length === 0) {
+                        alert('Please select a doctor to book.');
+                        return;
+                    }
+                    startBookingWizard(doctorsToCompare[0]);
+                });
+            }
+
+            // Book this doctor button (on profile page)
+            if (bookThisDoctorBtn) {
+                bookThisDoctorBtn.addEventListener('click', () => {
+                    if (currentDoctorProfile) {
+                        startBookingWizard(currentDoctorProfile.id);
+                    }
+                });
+            }
+
+            // New appointment button
+            if (newAppointmentBtn) {
+                newAppointmentBtn.addEventListener('click', () => {
+                    const confirmationSection = document.getElementById('confirmationSection');
+                    if (confirmationSection) confirmationSection.style.display = 'none';
+                    
+                    // Reset form
+                    const patientName = document.getElementById('patientName');
+                    const patientAge = document.getElementById('patientAge');
+                    const patientGender = document.getElementById('patientGender');
+                    
+                    if (patientName) patientName.value = '';
+                    if (patientAge) patientAge.value = '';
+                    if (patientGender) patientGender.value = '';
+                    
+                    selectedDoctor = null;
+                    selectedDate = null;
+                    selectedTime = null;
+                    currentStep = 1;
+                    navigateToStep(1);
+                    
+                    if (bookingWizard) bookingWizard.style.display = 'block';
+                });
+            }
+
+            // Rating stars
+            if (ratingStars) {
+                ratingStars.querySelectorAll('.rating-star').forEach(star => {
+                    star.addEventListener('click', function() {
+                        const rating = parseInt(this.getAttribute('data-rating'));
+                        currentRating = rating;
+                        
+                        // Update stars display
+                        ratingStars.querySelectorAll('.rating-star').forEach(s => {
+                            const starRating = parseInt(s.getAttribute('data-rating'));
+                            if (starRating <= rating) {
+                                s.innerHTML = '<i class="fas fa-star"></i>';
+                                s.classList.add('active');
+                            } else {
+                                s.innerHTML = '<i class="far fa-star"></i>';
+                                s.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Submit review
+            if (submitReviewBtn) {
+                submitReviewBtn.addEventListener('click', () => {
+                    const doctorId = reviewDoctorSelect ? parseInt(reviewDoctorSelect.value) : 0;
+                    const title = document.getElementById('reviewTitle')?.value || '';
+                    const comment = document.getElementById('reviewText')?.value || '';
+                    
+                    if (!doctorId || !title || !comment || currentRating === 0) {
+                        alert('Please fill in all fields and select a rating.');
+                        return;
+                    }
+                    
+                    const doctor = doctors.find(d => d.id === doctorId);
+                    const newReview = {
+                        id: userReviews.length + 1,
+                        doctorId: doctorId,
+                        doctorName: doctor?.name || 'Unknown Doctor',
+                        patientName: 'You',
+                        rating: currentRating,
+                        title: title,
+                        comment: comment,
+                        date: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    userReviews.push(newReview);
+                    localStorage.setItem('userReviews', JSON.stringify(userReviews));
+                    
+                    // Reset form
+                    if (reviewDoctorSelect) reviewDoctorSelect.value = '';
+                    const reviewTitle = document.getElementById('reviewTitle');
+                    const reviewText = document.getElementById('reviewText');
+                    if (reviewTitle) reviewTitle.value = '';
+                    if (reviewText) reviewText.value = '';
+                    currentRating = 0;
+                    if (ratingStars) {
+                        ratingStars.querySelectorAll('.rating-star').forEach(s => {
+                            s.innerHTML = '<i class="far fa-star"></i>';
+                            s.classList.remove('active');
+                        });
+                    }
+                    
+                    // Update reviews display
+                    renderReviews();
+                    renderDashboard();
+                    
+                    alert('Thank you for your review!');
+                });
+            }
+
+            // Login/Signup buttons 
+        if (loginBtn) {
+             loginBtn.addEventListener('click', () => {
+        if (loginModal) loginModal.style.display = 'flex';
+         });
+        }   
+
+        if (signupBtn) {
+            signupBtn.addEventListener('click', () => {
+        if (signupModal) signupModal.style.display = 'flex';
+         });
+        }
+
+            // Search buttons
+            if (searchBtn) {
+             searchBtn.addEventListener('click', () => {
+         const searchInput = document.getElementById('searchInput');
+         const query = searchInput?.value.trim();
+         if (query) {
+            alert(`Searching for: "${query}". (Mock: Navigating to doctor list.)`);
+            navigateToPage('doctors');  // Navigate to doctors page
+            // Pre-fill and trigger search on doctors page
+            setTimeout(() => {
+                const doctorSearchInput = document.getElementById('doctorSearchInput');
+                if (doctorSearchInput) {
+                    doctorSearchInput.value = query;
+                    performDoctorSearch(query);  // Simulate search
+                }
+                 }, 100);
+                } else {
+                     alert('Please enter a search term.');
+        }
+    });
+}
+
+            if (doctorSearchBtn) {
+    doctorSearchBtn.addEventListener('click', () => {
+        const doctorSearchInput = document.getElementById('doctorSearchInput');
+        const query = doctorSearchInput?.value.trim();
+        if (query) {
+            alert(`Searching doctors for: "${query}".`);
+            performDoctorSearch(query);  // Filter doctors
+        } else {
+            alert('Please enter a search term.');
+        }
+    });
+}
+
+            // Specialty cards
+            document.querySelectorAll('.specialty-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const specialty = this.getAttribute('data-specialty');
+                    navigateToPage('doctors');
+                    // Set the specialty filter
+                    setTimeout(() => {
+                        if (specialtyFilter) {
+                            specialtyFilter.value = specialty;
+                            filterDoctors();
+                        }
+                    }, 100);
+                });
+            });
+        }
+        // ... (existing functions like performDoctorSearch)
+
+// New: Handle login
+function handleLogin(email, password) {
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        updateUserUI();
+        if (loginModal) loginModal.style.display = 'none';
+        alert(`Welcome back, ${user.name}!`);
+    } else {
+        alert('Invalid email or password.');
+    }
+}
+
+// New: Handle signup
+function handleSignup(name, email, password, confirmPassword) {
+    if (password !== confirmPassword) {
+        alert('Passwords do not match.');
+        return;
+    }
+    if (users.some(u => u.email === email)) {
+        alert('Email already exists.');
+        return;
+    }
+    const newUser = { name, email, password };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    updateUserUI();
+    if (signupModal) signupModal.style.display = 'none';
+    alert(`Welcome, ${name}! Your account has been created.`);
+}
+
+// New: Update UI based on login state
+function updateUserUI() {
+    const headerControls = document.querySelector('.header-controls');
+    if (!headerControls) return;  // Safety check
+    
+    // Clear any existing welcome/logout elements
+    const existingWelcome = headerControls.querySelector('span');
+    const existingLogout = headerControls.querySelector('button:not(.theme-toggle):not(.accessibility-btn):not(#loginBtn):not(#signupBtn)');
+    if (existingWelcome) existingWelcome.remove();
+    if (existingLogout) existingLogout.remove();
+    
+    if (currentUser) {
+        // Hide login/signup, show welcome and logout
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        
+        const welcomeEl = document.createElement('span');
+        welcomeEl.textContent = `Welcome, ${currentUser.name}`;
+        welcomeEl.style.marginRight = '10px';
+        welcomeEl.style.color = 'var(--dark)';
+        
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'btn btn-outline';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserUI();  // Refresh UI to show buttons again
+            alert('Logged out successfully.');
+        });
+        
+        headerControls.appendChild(welcomeEl);
+        headerControls.appendChild(logoutBtn);
+    } else {
+        // Show login/signup, ensure they are visible
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+    }
+}
+
+
+// New: Setup login/signup modal events
+function setupAuthModals() {
+    // Close modals
+    if (closeLoginModal) {
+        closeLoginModal.addEventListener('click', () => {
+            if (loginModal) loginModal.style.display = 'none';
+        });
+    }
+    if (closeSignupModal) {
+        closeSignupModal.addEventListener('click', () => {
+            if (signupModal) signupModal.style.display = 'none';
+        });
+    }
+
+    // Switch between modals
+    if (switchToSignup) {
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (loginModal) loginModal.style.display = 'none';
+            if (signupModal) signupModal.style.display = 'flex';
+        });
+    }
+    if (switchToLogin) {
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (signupModal) signupModal.style.display = 'none';
+            if (loginModal) loginModal.style.display = 'flex';
+        });
+    }
+
+    // Form submissions
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            handleLogin(email, password);
+        });
+    }
+    if (signupForm) {
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            handleSignup(name, email, password, confirmPassword);
+        });
+    }
+}
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
